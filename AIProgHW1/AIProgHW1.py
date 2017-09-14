@@ -21,7 +21,7 @@ moves[(2,2)] = ['LEFT', 'UP']
 a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
-init_states=[a,b]
+init_states=[a, b]
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
 numNodesGen = 0
@@ -32,8 +32,8 @@ def main():
     global numNodesGen, numNodesExpanded, numPrintExpanded
 
     # Iterative Deepening Search for three inputs
-    i = 1
-    print("Iterative Deepening Search: ")
+   # i = 1
+    """print("Iterative Deepening Search: ")
     for input in init_states:
         print("Input " + str(i) + ":")
         print("First five nodes expanded: ")
@@ -43,12 +43,12 @@ def main():
         start_time = time.time()
         x = IDS(input)
         end_time = time.time() - start_time
-        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
         print("Solution sequence: ") 
         printSequence(x)
-        print("CPU execution time: " + str(end_time))
+        print("CPU execution time: " + str(end_time) + " ms")
         i = i + 1
-
+    """
     i = 1
     print("Depth First Graph Search: ")
     # Depth First Graph Search for three inputs
@@ -61,12 +61,12 @@ def main():
         start_time = time.time()
         x = DFGS(input)
         end_time = time.time() - start_time
-        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
         print("Solution sequence: ") 
         printSequence(x)
-        print("CPU execution time: " + str(end_time))
+        print("CPU execution time: " + str(end_time) + " ms")
         i = i + 1
-
+    """
     i = 1
     print("A star search: ")
     for input in init_states:
@@ -78,19 +78,22 @@ def main():
         start_time = time.time()
         x = Astar(input)
         end_time = time.time() - start_time
-        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
         print("Solution sequence: ") 
         printSequence(x)
-        print("CPU execution time: " + str(end_time))
+        print("CPU execution time: " + str(end_time) + " ms")
         i = i + 1
-       
+    """   
 def printSequence(node):
     nodeList = []
     nodeList.append(node)
     hold = node
     while( hold.parent != None):
-        nodeList.append(node.parent)
+        nodeList.append(hold.parent)
         hold = hold.parent
+    
+    nodeList.reverse()
+
     for item in nodeList:
         print(item.array)
 
