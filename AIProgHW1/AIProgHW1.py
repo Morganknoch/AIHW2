@@ -159,7 +159,14 @@ def RecursiveDLS(node, limit):
         if failure:
             return None
     
-
+#--------------------------------------------------------------
+#
+#   DFGS( start )
+#       Perform a Depth First Graph Search starting at the 
+#       'start' state. 
+#       Returns goal node on success and None object on failure
+#
+#--------------------------------------------------------------
 def DFGS( start ):
     visited = []                # List of visited nodes
     fringe = queue.Queue(0)     # FIFO for fringe
@@ -198,13 +205,22 @@ def DFGS( start ):
             global numNodesExpanded
             numNodesExpanded = numNodesExpanded + 1
 
+    # DFGS()
 
+#--------------------------------------------------------------
+#
+#   hasVisited( list_visited, node )
+#       Check if 'node' is in the list 'list_visited'.
+#
+#--------------------------------------------------------------
 def hasVisited( list_visited, node ):
     for x in list_visited:
         if node.array == x:
             return True
 
     return False
+
+    # hasVisited()
 
 
 def Astar():
