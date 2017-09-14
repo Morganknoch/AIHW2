@@ -1,12 +1,14 @@
 # dictionary for nodes visited
 import copy
 import time
+import queue
+
 #[0 1 2]
 #[3 4 5]
 #[6 7 8]
 
 moves = {}
-moves[(0, 0)] = ['DOWN', 'RIGHT']
+moves[(0,0)] = ['DOWN', 'RIGHT']
 moves[(0,1)] = ['LEFT', 'DOWN','RIGHT']
 moves[(0,2)] = ['LEFT', 'DOWN']
 moves[(1,0)] = ['UP', 'RIGHT', 'DOWN']
@@ -130,7 +132,7 @@ def DLS(start, limit):
     # Depth limited search
     return RecursiveDLS(GameBoardState(start), limit) 
 
-def RecursiveDLS(node,limit):
+def RecursiveDLS(node, limit):
     # recusive depth limited search
     if node.array == final_state:
         return node
@@ -155,8 +157,37 @@ def RecursiveDLS(node,limit):
             return None
     
 
-def DFGS():
-    pass
+def DFGS( start ):
+    visited = []                # List of visited nodes
+    fringe = queue.Queue(0)     # FIFO for fringe
+
+    fringe.put( GameBoardState(start) ) # Put the starting state in the fringe
+
+    while True:
+        if( fringe.empty() == True ):   # Visited all nodes and didn't find the solution
+            return None
+
+        node = fringe.get()
+        if( node.array == final_state ):    # Found solution
+            return node
+
+        if( hasVisited(visited, node) == False ):    # If node hasn't been visited
+            visited.append(node)
+
+            for x in legalMoves(node):      # Put all children in fringe
+                child = makeNode(x, node)   # create node for child
+                node.children.append(child) # add child to parents child list
+                child.parent = node         # point child to parent
+                fringe.put(child)           # add node to fringe
+
+
+def hasVisited( list_visited, node ):
+    for x in list_visited:
+        if node.array == x:
+            return True
+
+    return False
+
 
 def Astar():
     pass
