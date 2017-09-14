@@ -1,5 +1,6 @@
 # dictionary for nodes visited
 import copy
+import time
 #[0 1 2]
 #[3 4 5]
 #[6 7 8]
@@ -16,28 +17,82 @@ moves[(2,1)] = ['LEFT', 'UP', 'RIGHT']
 moves[(2,2)] = ['LEFT', 'UP']
 
 a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
-#a = [[1,2,3],[4,5,6],[7, '.', 8]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
-init_states=[a,b,c]
+init_states=[a,b]
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
-test = [[1,2,3],[4,5,6],[7,8,'.']]
-init_state=a
 
 numNodesGen = 0
 numNodesExpanded = 0
+numPrintExpanded = 0
 
 def main():
-    global numNodesGen, numNodesExpanded
-    #x = IDS(a)
-    #numNodesGen = 0
-    #numNodesExpanded = 0
-    #x = IDS(b)
-    #numNodesGen = 0
-    #numNodesExpanded = 0
-    x = IDS(c)
-    numNodesGen = 0
-    numNodesExpanded = 0
+    global numNodesGen, numNodesExpanded, numPrintExpanded
+
+    # Iterative Deepening Search for three inputs
+    i = 1
+    print("Iterative Deepening Search: ")
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = IDS(input)
+        end_time = time.time() - start_time
+        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        print("Solution sequence: ") 
+        printSequence(x)
+        print("CPU execution time: " + str(end_time))
+        i = i + 1
+
+    i = 1
+    print("Depth First Graph Search: ")
+    # Depth First Graph Search for three inputs
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = DFGS(input)
+        end_time = time.time() - start_time
+        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        print("Solution sequence: ") 
+        printSequence(x)
+        print("CPU execution time: " + str(end_time))
+        i = i + 1
+
+    i = 1
+    print("A star search: ")
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = Astar(input)
+        end_time = time.time() - start_time
+        end_time = end_time/1000                # Convert time in seconds to milliseconds
+        print("Solution sequence: ") 
+        printSequence(x)
+        print("CPU execution time: " + str(end_time))
+        i = i + 1
+       
+def printSequence(node):
+    nodeList = []
+    nodeList.append(node)
+    hold = node
+    while( hold.parent != None):
+        nodeList.append(node.parent)
+        hold = hold.parent
+    for item in nodeList:
+        print(item.array)
+
+    print("Number of moves to solution: " + str(len(nodeList)))
 
 def findSpace(state):
     # find the space ('.') to determine the legal moves that can be taken
@@ -57,7 +112,7 @@ class GameBoardState(object):
         self.parent = None
         self.children = []
         self.cost = 0
-
+        self.tileNumber = 0
         global numNodesGen 
         numNodesGen = numNodesGen + 1
 
@@ -65,7 +120,7 @@ def IDS(start):
     # Iterative Deepening tree search
     limit = 0
     input = copy.deepcopy(start)
-    while( numNodesGen <= 1000000 ):     
+    while( numNodesGen <= 100000 ):     
         result = DLS(input, limit)
         if result:
             return result
@@ -84,10 +139,14 @@ def RecursiveDLS(node,limit):
     else:
         failure = False
         children = generateChildNodes(node)
+        global numPrintExpanded
+        if(numPrintExpanded <= 5):
+            print(node.array)
+            numPrintExpanded = numPrintExpanded + 1
+        global numNodesExpanded
+        numNodesExpanded = numNodesExpanded + 1
         for child in children:
             result = RecursiveDLS(child, limit - 1)
-            global numNodesExpanded
-            numNodesExpanded = numNodesExpanded + 1
             if not result:
                 failure = True
             elif result:
@@ -123,7 +182,7 @@ def sortChildren(children):
     # sorts children by cost
     for x in children:
         for y in children:
-            if y.cost < x.cost:
+            if y.tileNumber < x.tileNumber:
                 hold = children[children.index(x)]
                 children[children.index(x)] = children[children.index(y)]
                 children[children.index(y)] = hold
@@ -138,28 +197,28 @@ def makeNode(move, state):
         holdstate = newstate.array[holdi-1][holdj]
         newstate.array[holdi-1][holdj] = '.'
         newstate.array[holdi][holdj] = holdstate
-        newstate.cost = holdstate         
+        newstate.tileNumber = holdstate         
     elif move == 'DOWN':
         
         holdi, holdj = findSpace(newstate)
         holdstate = newstate.array[holdi+1][holdj]
         newstate.array[holdi+1][holdj] = '.'
         newstate.array[holdi][holdj] = holdstate
-        newstate.cost = holdstate
+        newstate.tileNumber = holdstate
     elif move == 'LEFT':
         
         holdi, holdj = findSpace(newstate)
         holdstate = newstate.array[holdi][holdj-1]
         newstate.array[holdi][holdj-1] = '.'
         newstate.array[holdi][holdj] = holdstate
-        newstate.cost = holdstate
+        newstate.tileNumber = holdstate
     else:
         
         holdi, holdj = findSpace(newstate)
         holdstate = newstate.array[holdi][holdj+1]
         newstate.array[holdi][holdj+1] = '.'
         newstate.array[holdi][holdj] = holdstate
-        newstate.cost = holdstate
+        newstate.tileNumber = holdstate
     
     
 
