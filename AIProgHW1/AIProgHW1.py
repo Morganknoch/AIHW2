@@ -1,3 +1,10 @@
+# Authors
+#   Luke Mammen
+#   Morgan Knoch
+#
+# Last Edited on 9-14-17
+
+
 # dictionary for nodes visited
 import copy
 import time
