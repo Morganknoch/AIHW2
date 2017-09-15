@@ -307,7 +307,7 @@ def RecursiveDLS( node, limit ):
     else:
         # print first five expanded nodes
         global numPrintExpanded
-        if(numPrintExpanded <= 5):
+        if(numPrintExpanded < 5):
             print(node.array)
             numPrintExpanded = numPrintExpanded + 1
         # count num expanded nodes
@@ -369,7 +369,7 @@ def DFGS( start ):
                 fringe.put(child)           # add node to fringe
 
             # print first five expanded nodes
-            if(numPrintExpanded <= 5):
+            if(numPrintExpanded < 5):
                 print(node.array)
                 numPrintExpanded = numPrintExpanded + 1
             #count num expanded nodes
@@ -411,7 +411,7 @@ def Astar( start_state ):
             heapq.heappush( minHeap, child )
       
         # print first five expanded nodes
-        if(numPrintExpanded <= 5):
+        if(numPrintExpanded < 5):
             print(node.array)
             numPrintExpanded = numPrintExpanded + 1
         # count num expanded nodes
