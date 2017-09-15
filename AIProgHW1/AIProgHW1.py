@@ -150,6 +150,7 @@ class GameBoardState(object):
         self.parent = None
         self.children = []
         self.cost = 0
+        self.manhattenDistance = 0
         self.tileNumber = 0
         global numNodesGen 
         numNodesGen = numNodesGen + 1
@@ -314,8 +315,8 @@ def Astar(start_state):
     # Create first node to start
     global minQueue, numNodesExpanded, numPrintExpanded
     startNode = GameBoardState(start_state)
-    startNode.cost = manhattenDistance(startNode)
-    add_node(startNode, startNode.cost)
+    startNode.manhattenDistance = manhattenDistance(startNode)
+    add_node(startNode, (startNode.cost + startNode.manhattenDistance))
     
     while len(minQueue) != 0 and numNodesExpanded <= 100000:
         node = remove_node()            
@@ -326,11 +327,14 @@ def Astar(start_state):
             child = makeNode(x, node)   # create node for child
             node.children.append(child) # add child to parents child list
             child.parent = node  
-            add_node(child, child.cost)
+            add_node(child, (child.cost + child.manhattenDistance))
       
-        if(numPrintExpanded <= 5):
-            print(node.array)
-            numPrintExpanded = numPrintExpanded + 1
+        #if(numPrintExpanded <= 5):
+        #    print(node.array)
+        #    numPrintExpanded = numPrintExpanded + 1
+        print(node.array)
+        numNodesExpanded = numNodesExpanded + 1
+
     return None
 
     # hasVisited()
@@ -400,7 +404,8 @@ def makeNode(move, state):
     global isAstar
 
     if isAstar == True:
-        newstate.cost = manhattenDistance(newstate) + state.cost
+        newstate.cost = state.cost + 1
+        newstate.manhattenDistance = manhattenDistance(newstate)
 
     return newstate
 
