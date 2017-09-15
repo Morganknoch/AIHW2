@@ -51,22 +51,22 @@ def main():
     global numNodesGen, numNodesExpanded, numPrintExpanded
 
     # Iterative Deepening Search for three inputs
-   # i = 1
-    #print("Iterative Deepening Search: ")
-    #for input in init_states:
-    #    print("Input " + str(i) + ":")
-    #    print("First five nodes expanded: ")
-    #    numNodesGen = 0
-    #    numNodesExpanded = 0
-    #    numPrintExpanded = 0
-    #    start_time = time.time()
-    #    x = IDS(input)
-    #    end_time = time.time() - start_time
-    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
-    #    print("Solution sequence: ") 
-    #    printSequence(x)
-    #    print("CPU execution time: " + str(end_time) + " ms")
-    #    i = i + 1
+    i = 1
+    print("Iterative Deepening Search: ")
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = IDS(input)
+        end_time = time.time() - start_time
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
+        print("Solution sequence: ") 
+        printSequence(x)
+        print("CPU execution time: " + str(end_time) + " ms")
+        i = i + 1
     
     #i = 1
     #print("Depth First Graph Search: ")
@@ -86,24 +86,24 @@ def main():
     #    print("CPU execution time: " + str(end_time) + " ms")
     #    i = i + 1
     
-    i = 1
-    print("A star search: ")
-    for input in init_states:
-        global isAstar
-        isAstar = True
-        print("Input " + str(i) + ":")
-        print("First five nodes expanded: ")
-        numNodesGen = 0
-        numNodesExpanded = 0
-        numPrintExpanded = 0
-        start_time = time.time()
-        x = Astar(input)
-        end_time = time.time() - start_time
-        end_time = end_time * 1000                # Convert time in seconds to milliseconds
-        print("Solution sequence: ") 
-        printSequence(x)
-        print("CPU execution time: " + str(end_time) + " ms")
-        i = i + 1
+    #i = 1
+    #print("A star search: ")
+    #for input in init_states:
+    #    global isAstar
+    #    isAstar = True
+    #    print("Input " + str(i) + ":")
+    #    print("First five nodes expanded: ")
+    #    numNodesGen = 0
+    #    numNodesExpanded = 0
+    #    numPrintExpanded = 0
+    #    start_time = time.time()
+    #    x = Astar(input)
+    #    end_time = time.time() - start_time
+    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
+    #    print("Solution sequence: ") 
+    #    printSequence(x)
+    #    print("CPU execution time: " + str(end_time) + " ms")
+    #    i = i + 1
       
 def manhattenDistance(node):
     array = node.array
@@ -168,21 +168,36 @@ def DLS(start, limit):
     # Depth limited search
     return RecursiveDLS(GameBoardState(start), limit) 
 
+
+# recusive depth limited search
 def RecursiveDLS(node, limit):
-    # recusive depth limited search
+    
+    # Local Vars
+    failure = False
+
+    # The solution has been found
     if node.array == final_state:
         return node
+    
+    # The depth limit has been reached
     elif limit == 0:
         return None
+
+    # Continue further down the tree
     else:
-        failure = False
-        children = generateChildNodes(node)
+        # print first five expanded nodes
         global numPrintExpanded
         if(numPrintExpanded <= 5):
             print(node.array)
             numPrintExpanded = numPrintExpanded + 1
+        # count num expanded nodes
         global numNodesExpanded
         numNodesExpanded = numNodesExpanded + 1
+
+        # Get children nodes
+        children = generateChildNodes(node)
+
+        # Expand each child node
         for child in children:
             result = RecursiveDLS(child, limit - 1)
             if not result:
@@ -253,6 +268,7 @@ def hasVisited( list_visited, node ):
 
     return False
 
+    # hasVisited()
 
 def add_node(node, priority):
     global minQueue
