@@ -37,7 +37,11 @@ a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
 
+
+# SWITCH THESE TO RUN WITHOUT THE THIRD CASE
 init_states=[a, b, c]
+# init_states=[a, b]
+
 
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
@@ -60,9 +64,9 @@ def main():
 
     # Iterative Deepening Search for three inputs
     i = 1
-    print("Iterative Deepening Search: ")
+    print("\n\n------------------------------------------------------------------------\nIterative Deepening Search: ")
     for input in init_states:
-        print("Input " + str(i) + ":")
+        print("\nInput " + str(i) + ":")
         print("First five nodes expanded: ")
         numNodesGen = 0
         numNodesExpanded = 0
@@ -84,9 +88,9 @@ def main():
     
     # Depth First Graph Search for three inputs
     i = 1
-    print("Depth First Graph Search: ")
+    print("\n\n------------------------------------------------------------------------\nDepth First Graph Search: ")
     for input in init_states:
-        print("Input " + str(i) + ":")
+        print("\nInput " + str(i) + ":")
         print("First five nodes expanded: ")
         numNodesGen = 0
         numNodesExpanded = 0
@@ -107,11 +111,11 @@ def main():
     
     # A* Search for three inputs
     i = 1
-    print("A star search: ")
+    print("\n\n------------------------------------------------------------------------\nA* search: ")
     for input in init_states:
         global isAstar
         isAstar = True
-        print("Input " + str(i) + ":")
+        print("\nInput " + str(i) + ":")
         print("First five nodes expanded: ")
         numNodesGen = 0
         numNodesExpanded = 0
@@ -252,7 +256,7 @@ def IDS(start):
     input = copy.deepcopy(start)
 
     # Limit expanded nodes to 100k
-    while( numNodesGen <= 100000 ):     
+    while( numNodesExpanded <= 100000 ):     
         result = DLS(input, limit)
         if result:
             return result
@@ -327,13 +331,15 @@ def RecursiveDLS( node, limit ):
 #
 #--------------------------------------------------------------
 def DFGS( start ):
+    global numNodesExpanded
+    global numPrintExpanded
     visited = []                # List of visited nodes
     fringe = queue.Queue(0)     # FIFO for fringe
 
     fringe.put( GameBoardState(start) ) # Put the starting state in the fringe
 
     # limit DPGS to 100k nodes
-    while ( numNodesGen <= 100000 ):
+    while ( numNodesExpanded <= 100000 ):
         # Visited all nodes and didn't find the solution
         if( fringe.empty() == True ):   
             return None
@@ -356,14 +362,11 @@ def DFGS( start ):
                 fringe.put(child)           # add node to fringe
 
             # print first five expanded nodes
-            global numPrintExpanded
             if(numPrintExpanded <= 5):
                 print(node.array)
                 numPrintExpanded = numPrintExpanded + 1
             #count num expanded nodes
-            global numNodesExpanded
             numNodesExpanded = numNodesExpanded + 1
-
 # DFGS()
 
 
