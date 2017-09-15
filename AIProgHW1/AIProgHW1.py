@@ -2,6 +2,7 @@
 import copy
 import time
 import queue
+import heapq
 from operator import itemgetter
 #[0 1 2]
 #[3 4 5]
@@ -36,7 +37,7 @@ a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
 
-init_states=[c]
+init_states=[a]
 
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
@@ -50,23 +51,24 @@ minQueue = []
 def main():
     global numNodesGen, numNodesExpanded, numPrintExpanded
 
-    # Iterative Deepening Search for three inputs
-    i = 1
-    print("Iterative Deepening Search: ")
-    for input in init_states:
-        print("Input " + str(i) + ":")
-        print("First five nodes expanded: ")
-        numNodesGen = 0
-        numNodesExpanded = 0
-        numPrintExpanded = 0
-        start_time = time.time()
-        x = IDS(input)
-        end_time = time.time() - start_time
-        end_time = end_time * 1000                # Convert time in seconds to milliseconds
-        print("Solution sequence: ") 
-        printSequence(x)
-        print("CPU execution time: " + str(end_time) + " ms")
-        i = i + 1
+    ## Iterative Deepening Search for three inputs
+    #i = 1
+    #print("Iterative Deepening Search: ")
+    #for input in init_states:
+    #    print("Input " + str(i) + ":")
+    #    print("First five nodes expanded: ")
+    #    numNodesGen = 0
+    #    numNodesExpanded = 0
+    #    numPrintExpanded = 0
+    #    start_time = time.time()
+    #    x = IDS(input)
+    #    end_time = time.time() - start_time
+    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
+    #    print("Solution sequence: ") 
+    #    printSequence(x)
+    #    print("Number of nodes expanded: " + str(numNodesExpanded) )
+    #    print("CPU execution time: " + str(end_time) + " ms")
+    #    i = i + 1
     
     #i = 1
     #print("Depth First Graph Search: ")
@@ -83,29 +85,31 @@ def main():
     #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
     #    print("Solution sequence: ") 
     #    printSequence(x)
+    #    print("Number of nodes expanded: " + str(numNodesExpanded) )
     #    print("CPU execution time: " + str(end_time) + " ms")
     #    i = i + 1
     
-    #i = 1
-    #print("A star search: ")
-    #for input in init_states:
-    #    global isAstar
-    #    isAstar = True
-    #    print("Input " + str(i) + ":")
-    #    print("First five nodes expanded: ")
-    #    numNodesGen = 0
-    #    numNodesExpanded = 0
-    #    numPrintExpanded = 0
-    #    start_time = time.time()
-    #    x = Astar(input)
-    #    end_time = time.time() - start_time
-    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
-    #    print("Solution sequence: ") 
-    #    printSequence(x)
-    #    print("CPU execution time: " + str(end_time) + " ms")
-    #    i = i + 1
+    i = 1
+    print("A star search: ")
+    for input in init_states:
+        global isAstar
+        isAstar = True
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = Astar(input)
+        end_time = time.time() - start_time
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
+        print("Solution sequence: ") 
+        printSequence(x)
+        print("Number of nodes expanded: " + str(numNodesExpanded) )
+        print("CPU execution time: " + str(end_time) + " ms")
+        i = i + 1
       
-def manhattenDistance(node):
+def manhattenDistance( node ):
     array = node.array
     total = 0
     i = 0
@@ -117,6 +121,8 @@ def manhattenDistance(node):
             j = j + 1
         i = i + 1
     return total
+
+
 def printSequence(node):
     nodeList = []
     nodeList.append(node)
@@ -144,16 +150,43 @@ def findSpace(state):
         i = i + 1           
 
 class GameBoardState(object):
-    def __init__(self, state):
+    def __init__( self, state ):
         self.array = copy.deepcopy(state)
         self.visited = None  # might not use this
         self.parent = None
         self.children = []
-        self.cost = 0
+        self.pathCost = 0
         self.manhattenDistance = 0
+        self.totalCost = 0
         self.tileNumber = 0
         global numNodesGen 
         numNodesGen = numNodesGen + 1
+
+    # Calculate total cost;
+    # i.e. path cost to self + estimated cost to goal node
+    def calcCost( self ):
+        self.calcMD()
+        self.totalCost = self.pathCost + self.manhattenDistance
+
+    # Calc states manhatten distance
+    def calcMD( self ):
+        total = 0
+        i = 0
+        for x in self.array:
+            j = 0
+            for y in x:
+                a, b = location[y]
+                total = total + (abs(i-a) + abs(j-b))
+                j = j + 1
+            i = i + 1
+        self.manhattenDistance = total
+
+    def __lt__( self, other ):
+        if( self.totalCost != other.totalCost ):
+            return self.totalCost < other.totalCost
+        else:
+            return self.tileNumber > other.tileNumber
+
 
 def IDS(start):
     # Iterative Deepening tree search
@@ -254,7 +287,51 @@ def DFGS( start ):
             global numNodesExpanded
             numNodesExpanded = numNodesExpanded + 1
 
-    # DFGS()
+# DFGS()
+
+
+#--------------------------------------------------------------
+#
+#   Astar( start_state )
+#       Find solution path using A* algotithm
+#
+#--------------------------------------------------------------
+def Astar( start_state ):
+    # Local Vars
+    global numNodesExpanded, numPrintExpanded
+    minHeap = []
+
+    # Create first node to start
+    startNode = GameBoardState( start_state )
+    startNode.calcCost()
+
+    # Place startNode into min heap
+    heapq.heappush( minHeap, startNode )
+    
+    while len(minHeap) != 0 and numNodesExpanded <= 100000:
+        # Get smallest cost node from heap
+        node = heapq.heappop( minHeap )   
+        
+        # We found the goal node
+        if node.array == final_state:
+            return node
+
+        # Put children into minHeap
+        for x in legalMoves(node):      # Put all children in fringe
+            child = makeNode(x, node)   # create node for child
+            node.children.append(child) # add child to parents child list
+            child.parent = node  
+            heapq.heappush( minHeap, child )
+      
+        # print first five expanded nodes
+        if(numPrintExpanded <= 5):
+            print(node.array)
+            numPrintExpanded = numPrintExpanded + 1
+        # count num expanded nodes
+        numNodesExpanded = numNodesExpanded + 1
+
+    return None
+# Astar()
 
 #--------------------------------------------------------------
 #
@@ -268,78 +345,74 @@ def hasVisited( list_visited, node ):
             return True
 
     return False
+# hasVisited()
 
-    # hasVisited()
+#def add_node(node, priority):
+#    global minQueue
+#    minQueue.append((priority, node))
+#    minQueue = sorted(minQueue, key = itemgetter(0))
+#    #minQueue.reverse()
 
-def add_node(node, priority):
-    global minQueue
-    minQueue.append((priority, node))
-    minQueue = sorted(minQueue, key = itemgetter(0))
-    #minQueue.reverse()
-
-def remove_node():
-    global minQueue
-    #minQueue.reverse()
-    hold = minQueue.pop(0)
-    i, node = hold
+#def remove_node():
+#    global minQueue
+#    #minQueue.reverse()
+#    hold = minQueue.pop(0)
+#    i, node = hold
         
-    tieList = []
-    tieList.append((node.tileNumber, node))
+#    tieList = []
+#    tieList.append((node.tileNumber, node))
     
-    # Create list to hold the tied nodes
-    for x in minQueue:
-        m,n = x
-        if i == m:
-           tieList.append((n.tileNumber, n))
-        else:
-            break
+#    # Create list to hold the tied nodes
+#    for x in minQueue:
+#        m,n = x
+#        if i == m:
+#           tieList.append((n.tileNumber, n))
+#        else:
+#            break
     
-    # Figure out which node has the biggest tile number
-    tieList = sorted(tieList, key=itemgetter(0))
+#    # Figure out which node has the biggest tile number
+#    tieList = sorted(tieList, key=itemgetter(0))
     
-    tilenum, newHold = tieList.pop()
+#    tilenum, newHold = tieList.pop()
 
-#    minQueue.reverse()
+##    minQueue.reverse()
     
-    # If the current node is still the highest then return it
-    if node == newHold:
-        return node
-    else:                           # else put it back in the minQueue
-        minQueue.append((i, node))
+#    # If the current node is still the highest then return it
+#    if node == newHold:
+#        return node
+#    else:                           # else put it back in the minQueue
+#        minQueue.append((i, node))
 
-    minQueue = sorted(minQueue, key = itemgetter(0))
+#    minQueue = sorted(minQueue, key = itemgetter(0))
     
-    return newHold
+#    return newHold
 
-def Astar(start_state):
-    # Create first node to start
-    global minQueue, numNodesExpanded, numPrintExpanded
-    startNode = GameBoardState(start_state)
-    startNode.manhattenDistance = manhattenDistance(startNode)
-    add_node(startNode, (startNode.cost + startNode.manhattenDistance))
+
+#def Astar(start_state):
+#    # Create first node to start
+#    global minQueue, numNodesExpanded, numPrintExpanded
+#    startNode = GameBoardState(start_state)
+#    startNode.manhattenDistance = manhattenDistance(startNode)
+#    add_node(startNode, (startNode.cost + startNode.manhattenDistance))
     
-    while len(minQueue) != 0 and numNodesExpanded <= 100000:
-        node = remove_node()            
+#    while len(minQueue) != 0 and numNodesExpanded <= 100000:
+#        node = remove_node()            
         
-        if node.array == final_state:
-            return node
-        for x in legalMoves(node):      # Put all children in fringe
-            child = makeNode(x, node)   # create node for child
-            node.children.append(child) # add child to parents child list
-            child.parent = node  
-            add_node(child, (child.cost + child.manhattenDistance))
+#        if node.array == final_state:
+#            return node
+#        for x in legalMoves(node):      # Put all children in fringe
+#            child = makeNode(x, node)   # create node for child
+#            node.children.append(child) # add child to parents child list
+#            child.parent = node  
+#            add_node(child, (child.cost + child.manhattenDistance))
       
-        #if(numPrintExpanded <= 5):
-        #    print(node.array)
-        #    numPrintExpanded = numPrintExpanded + 1
-        print(node.array)
-        numNodesExpanded = numNodesExpanded + 1
+#        #if(numPrintExpanded <= 5):
+#        #    print(node.array)
+#        #    numPrintExpanded = numPrintExpanded + 1
+#        print(node.array)
+#        numNodesExpanded = numNodesExpanded + 1
 
-    return None
-
-    # hasVisited()
-
-
+#    return None
 
 
 def legalMoves(state):
@@ -404,8 +477,8 @@ def makeNode(move, state):
     global isAstar
 
     if isAstar == True:
-        newstate.cost = state.cost + 1
-        newstate.manhattenDistance = manhattenDistance(newstate)
+        newstate.pathCost = state.pathCost + 1
+        newstate.calcCost()
 
     return newstate
 
