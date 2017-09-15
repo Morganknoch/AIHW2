@@ -2,11 +2,12 @@
 import copy
 import time
 import queue
-
+from operator import itemgetter
 #[0 1 2]
 #[3 4 5]
 #[6 7 8]
 
+# dictionary holding the legal moves that can be performed depending on the location of the '.'
 moves = {}
 moves[(0,0)] = ['DOWN', 'RIGHT']
 moves[(0,1)] = ['LEFT', 'DOWN','RIGHT']
@@ -18,58 +19,76 @@ moves[(2,0)] = ['UP', 'RIGHT']
 moves[(2,1)] = ['LEFT', 'UP', 'RIGHT']
 moves[(2,2)] = ['LEFT', 'UP']
 
+# dictionary holding the actual locations of the final state
+location = {}
+location[1] = [0,0]
+location[2] = [0,1]
+location[3] = [0,2]
+location[4] = [1,0]
+location[5] = [1,1]
+location[6] = [1,2]
+location[7] = [2,0]
+location[8] = [2,1]
+location['.'] = [2,2]
+
+# the input puzzles to the program
 a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
-init_states=[a, b]
+init_states=[c]
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
+# global variables
 numNodesGen = 0
 numNodesExpanded = 0
 numPrintExpanded = 0
+isAstar = False
+minQueue = []
 
 def main():
     global numNodesGen, numNodesExpanded, numPrintExpanded
 
     # Iterative Deepening Search for three inputs
    # i = 1
-    """print("Iterative Deepening Search: ")
-    for input in init_states:
-        print("Input " + str(i) + ":")
-        print("First five nodes expanded: ")
-        numNodesGen = 0
-        numNodesExpanded = 0
-        numPrintExpanded = 0
-        start_time = time.time()
-        x = IDS(input)
-        end_time = time.time() - start_time
-        end_time = end_time * 1000                # Convert time in seconds to milliseconds
-        print("Solution sequence: ") 
-        printSequence(x)
-        print("CPU execution time: " + str(end_time) + " ms")
-        i = i + 1
-    """
-    i = 1
-    print("Depth First Graph Search: ")
-    # Depth First Graph Search for three inputs
-    for input in init_states:
-        print("Input " + str(i) + ":")
-        print("First five nodes expanded: ")
-        numNodesGen = 0
-        numNodesExpanded = 0
-        numPrintExpanded = 0
-        start_time = time.time()
-        x = DFGS(input)
-        end_time = time.time() - start_time
-        end_time = end_time * 1000                # Convert time in seconds to milliseconds
-        print("Solution sequence: ") 
-        printSequence(x)
-        print("CPU execution time: " + str(end_time) + " ms")
-        i = i + 1
-    """
+    #print("Iterative Deepening Search: ")
+    #for input in init_states:
+    #    print("Input " + str(i) + ":")
+    #    print("First five nodes expanded: ")
+    #    numNodesGen = 0
+    #    numNodesExpanded = 0
+    #    numPrintExpanded = 0
+    #    start_time = time.time()
+    #    x = IDS(input)
+    #    end_time = time.time() - start_time
+    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
+    #    print("Solution sequence: ") 
+    #    printSequence(x)
+    #    print("CPU execution time: " + str(end_time) + " ms")
+    #    i = i + 1
+    
+    #i = 1
+    #print("Depth First Graph Search: ")
+    ## Depth First Graph Search for three inputs
+    #for input in init_states:
+    #    print("Input " + str(i) + ":")
+    #    print("First five nodes expanded: ")
+    #    numNodesGen = 0
+    #    numNodesExpanded = 0
+    #    numPrintExpanded = 0
+    #    start_time = time.time()
+    #    x = DFGS(input)
+    #    end_time = time.time() - start_time
+    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
+    #    print("Solution sequence: ") 
+    #    printSequence(x)
+    #    print("CPU execution time: " + str(end_time) + " ms")
+    #    i = i + 1
+    
     i = 1
     print("A star search: ")
     for input in init_states:
+        global isAstar
+        isAstar = True
         print("Input " + str(i) + ":")
         print("First five nodes expanded: ")
         numNodesGen = 0
@@ -83,7 +102,19 @@ def main():
         printSequence(x)
         print("CPU execution time: " + str(end_time) + " ms")
         i = i + 1
-    """   
+      
+def manhattenDistance(node):
+    array = node.array
+    total = 0
+    i = 0
+    for x in array:
+        j = 0
+        for y in x:
+            a, b = location[y]
+            total = total + (abs(i-a) + abs(j-b))
+            j = j + 1
+        i = i + 1
+    return total
 def printSequence(node):
     nodeList = []
     nodeList.append(node)
@@ -191,9 +222,69 @@ def hasVisited( list_visited, node ):
 
     return False
 
+def add_node(node, priority):
+    global minQueue
+    minQueue.append((priority, node))
+    minQueue = sorted(minQueue, key = itemgetter(0))
+    #minQueue.reverse()
 
-def Astar():
-    pass
+def remove_node():
+    global minQueue
+    #minQueue.reverse()
+    hold = minQueue.pop(0)
+    i, node = hold
+        
+    tieList = []
+    tieList.append((node.tileNumber, node))
+    
+    # Create list to hold the tied nodes
+    for x in minQueue:
+        m,n = x
+        if i == m:
+           tieList.append((n.tileNumber, n))
+        else:
+            break
+    
+    # Figure out which node has the biggest tile number
+    tieList = sorted(tieList, key=itemgetter(0))
+    
+    tilenum, newHold = tieList.pop()
+
+#    minQueue.reverse()
+    
+    # If the current node is still the highest then return it
+    if node == newHold:
+        return node
+    else:                           # else put it back in the minQueue
+        minQueue.append((i, node))
+
+    minQueue = sorted(minQueue, key = itemgetter(0))
+    
+    return newHold
+
+def Astar(start_state):
+    # Create first node to start
+    global minQueue, numNodesExpanded, numPrintExpanded
+    startNode = GameBoardState(start_state)
+    startNode.cost = manhattenDistance(startNode)
+    add_node(startNode, startNode.cost)
+    
+    while len(minQueue) != 0 and numNodesExpanded <= 100000:
+        node = remove_node()            
+        
+        if node.array == final_state:
+            return node
+        for x in legalMoves(node):      # Put all children in fringe
+            child = makeNode(x, node)   # create node for child
+            node.children.append(child) # add child to parents child list
+            child.parent = node  
+            add_node(child, child.cost)
+      
+        if(numPrintExpanded <= 5):
+            print(node.array)
+            numPrintExpanded = numPrintExpanded + 1
+    return None
+
 
 def legalMoves(state):
     # returns a list of the legal moves that can be done depending on the location of the '.'
@@ -254,7 +345,10 @@ def makeNode(move, state):
         newstate.array[holdi][holdj] = holdstate
         newstate.tileNumber = holdstate
     
-    
+    global isAstar
+
+    if isAstar == True:
+        newstate.cost = manhattenDistance(newstate) + state.cost
 
     return newstate
 
