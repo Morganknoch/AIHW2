@@ -37,7 +37,7 @@ a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
 
-init_states=[c]
+init_states=[a, b, c]
 
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
@@ -48,47 +48,64 @@ numPrintExpanded = 0
 isAstar = False
 minQueue = []
 
+
+#--------------------------------------------------------------
+#
+#   main()
+#       Main function
+#
+#--------------------------------------------------------------
 def main():
     global numNodesGen, numNodesExpanded, numPrintExpanded
 
-    ## Iterative Deepening Search for three inputs
-    #i = 1
-    #print("Iterative Deepening Search: ")
-    #for input in init_states:
-    #    print("Input " + str(i) + ":")
-    #    print("First five nodes expanded: ")
-    #    numNodesGen = 0
-    #    numNodesExpanded = 0
-    #    numPrintExpanded = 0
-    #    start_time = time.time()
-    #    x = IDS(input)
-    #    end_time = time.time() - start_time
-    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
-    #    print("Solution sequence: ") 
-    #    printSequence(x)
-    #    print("Number of nodes expanded: " + str(numNodesExpanded) )
-    #    print("CPU execution time: " + str(end_time) + " ms")
-    #    i = i + 1
+    # Iterative Deepening Search for three inputs
+    i = 1
+    print("Iterative Deepening Search: ")
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = IDS(input)
+        end_time = time.time() - start_time
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
+        # Check for failure
+        if( x == None ):
+            print("Search Failed!")
+        else:
+            print("Solution sequence: ") 
+            printSequence(x)
+
+        print("Number of nodes expanded: " + str(numNodesExpanded) )
+        print("CPU execution time: " + str(end_time) + " ms")
+        i = i + 1
     
-    #i = 1
-    #print("Depth First Graph Search: ")
-    ## Depth First Graph Search for three inputs
-    #for input in init_states:
-    #    print("Input " + str(i) + ":")
-    #    print("First five nodes expanded: ")
-    #    numNodesGen = 0
-    #    numNodesExpanded = 0
-    #    numPrintExpanded = 0
-    #    start_time = time.time()
-    #    x = DFGS(input)
-    #    end_time = time.time() - start_time
-    #    end_time = end_time * 1000                # Convert time in seconds to milliseconds
-    #    print("Solution sequence: ") 
-    #    printSequence(x)
-    #    print("Number of nodes expanded: " + str(numNodesExpanded) )
-    #    print("CPU execution time: " + str(end_time) + " ms")
-    #    i = i + 1
+    # Depth First Graph Search for three inputs
+    i = 1
+    print("Depth First Graph Search: ")
+    for input in init_states:
+        print("Input " + str(i) + ":")
+        print("First five nodes expanded: ")
+        numNodesGen = 0
+        numNodesExpanded = 0
+        numPrintExpanded = 0
+        start_time = time.time()
+        x = DFGS(input)
+        end_time = time.time() - start_time
+        end_time = end_time * 1000                # Convert time in seconds to milliseconds
+        # Check for failure
+        if( x == None ):
+            print("Search Failed!")
+        else:
+            print("Solution sequence: ") 
+            printSequence(x)
+        print("Number of nodes expanded: " + str(numNodesExpanded) )
+        print("CPU execution time: " + str(end_time) + " ms")
+        i = i + 1
     
+    # A* Search for three inputs
     i = 1
     print("A star search: ")
     for input in init_states:
@@ -103,12 +120,24 @@ def main():
         x = Astar(input)
         end_time = time.time() - start_time
         end_time = end_time * 1000                # Convert time in seconds to milliseconds
-        print("Solution sequence: ") 
-        printSequence(x)
+        # Check for failure
+        if( x == None ):
+            print("Search Failed!")
+        else:
+            print("Solution sequence: ") 
+            printSequence(x)
         print("Number of nodes expanded: " + str(numNodesExpanded) )
         print("CPU execution time: " + str(end_time) + " ms")
         i = i + 1
-      
+ # main()
+        
+#--------------------------------------------------------------
+#
+#   manhattenDistance( node )
+#       Calculates the cumulative manhatten distance for the
+#       state
+#
+#--------------------------------------------------------------
 def manhattenDistance( node ):
     array = node.array
     total = 0
@@ -121,8 +150,15 @@ def manhattenDistance( node ):
             j = j + 1
         i = i + 1
     return total
+# manhattenDistance()
 
 
+#--------------------------------------------------------------
+#
+#   printSequence( node )
+#       Prints the solution sequence
+#
+#--------------------------------------------------------------
 def printSequence(node):
     nodeList = []
     nodeList.append(node)
@@ -137,9 +173,16 @@ def printSequence(node):
         print(item.array)
 
     print("Number of moves to solution: " + str(len(nodeList)))
+# printSequence()
 
+
+#--------------------------------------------------------------
+#
+#   findSpace(state)
+#       Returns the x,y position of the empty space
+#
+#--------------------------------------------------------------
 def findSpace(state):
-    # find the space ('.') to determine the legal moves that can be taken
     i = 0
     for a in state.array:
         j = 0
@@ -147,8 +190,16 @@ def findSpace(state):
             if b == '.':
                 return i,j
             j = j + 1
-        i = i + 1           
+        i = i + 1     
+# findSpace()
+        
 
+#--------------------------------------------------------------
+#
+#   Class GameBoardState( state )
+#       Represents the state of the game board between moves
+#
+#--------------------------------------------------------------
 class GameBoardState(object):
     def __init__( self, state ):
         self.array = copy.deepcopy(state)
@@ -186,26 +237,50 @@ class GameBoardState(object):
             return self.totalCost < other.totalCost
         else:
             return self.tileNumber > other.tileNumber
+# Class GameBoardState()
 
 
+#--------------------------------------------------------------
+#
+#   IDS(start)
+#       Performs an Itterative deepening tree search
+#
+#--------------------------------------------------------------
 def IDS(start):
-    # Iterative Deepening tree search
+
     limit = 0
     input = copy.deepcopy(start)
+
+    # Limit expanded nodes to 100k
     while( numNodesGen <= 100000 ):     
         result = DLS(input, limit)
         if result:
             return result
         limit = limit + 1
 
+    # Search failed
+    return None
+# IDS()
+
+
+#--------------------------------------------------------------
+#
+#   DLS(start, limit)
+#       Calls the recursive function for DLS
+#
+#--------------------------------------------------------------
 def DLS(start, limit):
-    # Depth limited search
-    return RecursiveDLS(GameBoardState(start), limit) 
+    return RecursiveDLS( GameBoardState(start), limit ) 
+# DLS()
 
 
-# recusive depth limited search
-def RecursiveDLS(node, limit):
-    
+#--------------------------------------------------------------
+#
+#   RecursiveDLS(node, limit)
+#       Perform a Depth Limited Search to find a solution
+#
+#--------------------------------------------------------------
+def RecursiveDLS( node, limit ):
     # Local Vars
     failure = False
 
@@ -240,7 +315,9 @@ def RecursiveDLS(node, limit):
                 return result
         if failure:
             return None
-    
+# RecursiveDLS()
+
+
 #--------------------------------------------------------------
 #
 #   DFGS( start )
@@ -333,6 +410,7 @@ def Astar( start_state ):
     return None
 # Astar()
 
+
 #--------------------------------------------------------------
 #
 #   hasVisited( list_visited, node )
@@ -348,14 +426,30 @@ def hasVisited( list_visited, node ):
 # hasVisited()
 
 
+#--------------------------------------------------------------
+#
+#   legalMoves( state )
+#       Returns a list of the legal moves that can be done
+#       depending on the location of the '.'
+#
+#--------------------------------------------------------------
 def legalMoves(state):
-    # returns a list of the legal moves that can be done depending on the location of the '.'
     row, col = findSpace(state)
     return moves[(row,col)]
+# legalMoves()
 
+
+#--------------------------------------------------------------
+#
+#   generateChildNodes( node )
+#       Generates all of the child nodes for a given node
+#
+#--------------------------------------------------------------
 def generateChildNodes(node):
-    # generates all of the child nodes for a given node
+    # Local Vars
     children = []
+
+    # Get the children
     for x in legalMoves(node):
         child = makeNode(x, node)
         node.children.append(child)
@@ -364,9 +458,16 @@ def generateChildNodes(node):
         
     children = sortChildren(children)
     return children
+# generateChildNodes()
 
+
+#--------------------------------------------------------------
+#
+#   sortChildren( children )
+#       Sorts children by tile ID being moved, small -> big
+#
+#--------------------------------------------------------------
 def sortChildren(children):
-    # sorts children by cost
     for x in children:
         for y in children:
             if y.tileNumber < x.tileNumber:
@@ -374,12 +475,20 @@ def sortChildren(children):
                 children[children.index(x)] = children[children.index(y)]
                 children[children.index(y)] = hold
     return children
+# sortChildren()
 
+
+#--------------------------------------------------------------
+#
+#   makeNode(move, state)
+#       Creates a node with the specified 'move' applied to the
+#       'state'
+#
+#--------------------------------------------------------------
 def makeNode(move, state):
-    # creates a node with the current state and modifies it to include the new state after the move is done
     newstate = GameBoardState(state.array)
+
     if move == 'UP':
-        
         holdi, holdj = findSpace(newstate)
         holdstate = newstate.array[holdi-1][holdj]
         newstate.array[holdi-1][holdj] = '.'
@@ -414,5 +523,8 @@ def makeNode(move, state):
         newstate.calcCost()
 
     return newstate
+# makeNode()
 
+
+# Call main function
 main()
