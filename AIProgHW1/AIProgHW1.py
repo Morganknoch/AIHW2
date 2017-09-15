@@ -35,7 +35,9 @@ location['.'] = [2,2]
 a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
+
 init_states=[c]
+
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
 # global variables
@@ -190,37 +192,67 @@ def RecursiveDLS(node, limit):
         if failure:
             return None
     
-
+#--------------------------------------------------------------
+#
+#   DFGS( start )
+#       Perform a Depth First Graph Search starting at the 
+#       'start' state. 
+#       Returns goal node on success and None object on failure
+#
+#--------------------------------------------------------------
 def DFGS( start ):
     visited = []                # List of visited nodes
     fringe = queue.Queue(0)     # FIFO for fringe
 
     fringe.put( GameBoardState(start) ) # Put the starting state in the fringe
 
-    while True:
-        if( fringe.empty() == True ):   # Visited all nodes and didn't find the solution
+    # limit DPGS to 100k nodes
+    while ( numNodesGen <= 100000 ):
+        # Visited all nodes and didn't find the solution
+        if( fringe.empty() == True ):   
             return None
-
+        
         node = fringe.get()
-        if( node.array == final_state ):    # Found solution
-            return node
 
-        if( hasVisited(visited, node) == False ):    # If node hasn't been visited
+        # Found solution
+        if( node.array == final_state ):    
+            return node
+        
+        # If node hasn't been visited
+        if( hasVisited(visited, node) == False ):    
             visited.append(node)
 
-            for x in legalMoves(node):      # Put all children in fringe
+            # Put all children in fringe
+            for x in legalMoves(node):      
                 child = makeNode(x, node)   # create node for child
                 node.children.append(child) # add child to parents child list
                 child.parent = node         # point child to parent
                 fringe.put(child)           # add node to fringe
 
+            # print first five expanded nodes
+            global numPrintExpanded
+            if(numPrintExpanded <= 5):
+                print(node.array)
+                numPrintExpanded = numPrintExpanded + 1
+            #count num expanded nodes
+            global numNodesExpanded
+            numNodesExpanded = numNodesExpanded + 1
 
+    # DFGS()
+
+#--------------------------------------------------------------
+#
+#   hasVisited( list_visited, node )
+#       Check if 'node' is in the list 'list_visited'.
+#
+#--------------------------------------------------------------
 def hasVisited( list_visited, node ):
     for x in list_visited:
         if node.array == x:
             return True
 
     return False
+
 
 def add_node(node, priority):
     global minQueue
@@ -284,6 +316,10 @@ def Astar(start_state):
             print(node.array)
             numPrintExpanded = numPrintExpanded + 1
     return None
+
+    # hasVisited()
+
+
 
 
 def legalMoves(state):
