@@ -37,7 +37,7 @@ a = [['.', 1, 3],[4, 2, 5],[7, 8, 6]]
 b = [['.', 5, 2], [1, 8, 3], [4, 7, 6]]
 c = [[8, 6, 7], [2, 5, 4], [3, '.', 1]]
 
-init_states=[a]
+init_states=[c]
 
 final_state = [[1,2,3],[4,5,6],[7,8,'.']]
 
@@ -346,73 +346,6 @@ def hasVisited( list_visited, node ):
 
     return False
 # hasVisited()
-
-#def add_node(node, priority):
-#    global minQueue
-#    minQueue.append((priority, node))
-#    minQueue = sorted(minQueue, key = itemgetter(0))
-#    #minQueue.reverse()
-
-#def remove_node():
-#    global minQueue
-#    #minQueue.reverse()
-#    hold = minQueue.pop(0)
-#    i, node = hold
-        
-#    tieList = []
-#    tieList.append((node.tileNumber, node))
-    
-#    # Create list to hold the tied nodes
-#    for x in minQueue:
-#        m,n = x
-#        if i == m:
-#           tieList.append((n.tileNumber, n))
-#        else:
-#            break
-    
-#    # Figure out which node has the biggest tile number
-#    tieList = sorted(tieList, key=itemgetter(0))
-    
-#    tilenum, newHold = tieList.pop()
-
-##    minQueue.reverse()
-    
-#    # If the current node is still the highest then return it
-#    if node == newHold:
-#        return node
-#    else:                           # else put it back in the minQueue
-#        minQueue.append((i, node))
-
-#    minQueue = sorted(minQueue, key = itemgetter(0))
-    
-#    return newHold
-
-
-#def Astar(start_state):
-#    # Create first node to start
-#    global minQueue, numNodesExpanded, numPrintExpanded
-#    startNode = GameBoardState(start_state)
-#    startNode.manhattenDistance = manhattenDistance(startNode)
-#    add_node(startNode, (startNode.cost + startNode.manhattenDistance))
-    
-#    while len(minQueue) != 0 and numNodesExpanded <= 100000:
-#        node = remove_node()            
-        
-#        if node.array == final_state:
-#            return node
-#        for x in legalMoves(node):      # Put all children in fringe
-#            child = makeNode(x, node)   # create node for child
-#            node.children.append(child) # add child to parents child list
-#            child.parent = node  
-#            add_node(child, (child.cost + child.manhattenDistance))
-      
-#        #if(numPrintExpanded <= 5):
-#        #    print(node.array)
-#        #    numPrintExpanded = numPrintExpanded + 1
-#        print(node.array)
-#        numNodesExpanded = numNodesExpanded + 1
-
-#    return None
 
 
 def legalMoves(state):
